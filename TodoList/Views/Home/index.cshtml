@@ -1,0 +1,98 @@
+@model List<TodoItem>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    .task-container {
+        margin-bottom: 15px;
+    }
+
+    .task-form {
+        border: 1px solid #ccc; /* Add a border to the form */
+        padding: 10px;
+        margin-bottom: 15px; /* Set margin for the form */
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .task {
+        display: flex;
+        align-items: center;
+    }
+
+    .task-text {
+        flex-grow: 1;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 5px;
+        display: inline-block;
+        margin-bottom: 5px; /* Set margin for each task */
+    }
+
+    .task-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .edit-form {
+        margin-top: 10px;
+        display: none;
+    }
+</style>
+
+
+<!-- Form for adding a new task -->
+<div class="task-container task-form">
+    <form asp-action="Create" method="post" class="task-form">
+        <div class="form-group">
+            <input type="text" placeholder="New Task" id="newTask" name="Task" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Add Task</button>
+    </form>
+</div>
+
+<!-- Display existing tasks -->
+@foreach (var item in Model)
+{
+    <div class="task-container">
+        <div class="task">
+            <span class="task-text" data-task-id="@item.Id">@item.Task</span>
+            <div class="task-buttons">
+                <button class="btn btn-success update-task" data-task-id="@item.Id">Update</button>
+                <button class="btn btn-info edit-task" data-task-id="@item.Id">Edit</button>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    // Add a script to handle the visibility of the editable form
+    document.querySelectorAll('.edit-task').forEach(editButton => {
+        editButton.addEventListener('click', function () {
+            const taskId = this.dataset.taskId;
+            const taskText = document.querySelector(`.task-text[data-task-id="${taskId}"]`);
+
+            // Toggle the visibility of the edit form
+            if (taskText) {
+                taskText.contentEditable = true;
+                taskText.focus();
+            }
+        });
+    });
+
+    // Add a script to handle the update button
+    document.querySelectorAll('.update-task').forEach(updateButton => {
+        updateButton.addEventListener('click', function () {
+            const taskId = this.dataset.taskId;
+            const taskText = document.querySelector(`.task-text[data-task-id="${taskId}"]`);
+
+            if (taskText) {
+                taskText.contentEditable = false;
+                // Perform the update logic here, e.g., send an AJAX request to the server
+            }
+        });
+    });
+</script>
